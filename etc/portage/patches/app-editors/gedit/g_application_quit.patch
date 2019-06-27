@@ -1,0 +1,12 @@
+diff -ruN a/gedit/gedit-commands-file.c b/gedit/gedit-commands-file.c
+--- a/gedit/gedit-commands-file.c	2018-10-16 12:40:41.439997208 +0200
++++ b/gedit/gedit-commands-file.c	2018-10-16 12:47:24.139996473 +0200
+@@ -1135,7 +1135,7 @@
+ 		gtk_widget_destroy (GTK_WIDGET (window));
+ 	}
+ 
+-	if (is_quitting_all)
++	if (is_quitting || is_quitting_all)
+ 	{
+ 		GtkApplication *app;
+ 
