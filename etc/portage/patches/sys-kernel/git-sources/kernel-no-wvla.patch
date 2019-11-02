@@ -1,0 +1,12 @@
+diff -ruN a/Makefile b/Makefile
+--- a/Makefile	2019-05-14 18:04:09.919221498 +0200
++++ b/Makefile	2019-05-14 18:05:16.067640213 +0200
+@@ -840,7 +840,7 @@
+ KBUILD_CFLAGS += -Wdeclaration-after-statement
+ 
+ # Variable Length Arrays (VLAs) should not be used anywhere in the kernel
+-KBUILD_CFLAGS += -Wvla
++#KBUILD_CFLAGS += -Wvla
+ 
+ # disable pointer signed / unsigned warnings in gcc 4.0
+ KBUILD_CFLAGS += -Wno-pointer-sign
