@@ -1,0 +1,27 @@
+diff -ruN a/kernel/common/inc/nv-linux.h b/kernel/common/inc/nv-linux.h
+--- a/kernel/common/inc/nv-linux.h	2020-01-23 08:18:47.808433310 +0100
++++ b/kernel/common/inc/nv-linux.h	2020-01-23 08:20:41.125824795 +0100
+@@ -531,7 +531,7 @@
+ 
+ static inline void *nv_ioremap_nocache(NvU64 phys, NvU64 size)
+ {
+-    void *ptr = ioremap_nocache(phys, size);
++    void *ptr = ioremap(phys, size);
+     if (ptr)
+         NV_MEMDBG_ADD(ptr, size);
+     return ptr;
+diff -ruN a/kernel/nvidia/os-interface.c b/kernel/nvidia/os-interface.c
+--- a/kernel/nvidia/os-interface.c	2020-01-23 08:18:47.818433061 +0100
++++ b/kernel/nvidia/os-interface.c	2020-01-23 08:19:22.247595009 +0100
+@@ -477,9 +477,9 @@
+ 
+ void NV_API_CALL os_get_current_tick(NvU64 *nseconds)
+ {
+-    struct timespec ts;
++    struct timespec64 ts;
+ 
+-    jiffies_to_timespec(jiffies, &ts);
++    jiffies_to_timespec64(jiffies, &ts);
+ 
+     *nseconds = ((NvU64)ts.tv_sec * NSEC_PER_SEC + (NvU64)ts.tv_nsec);
+ }

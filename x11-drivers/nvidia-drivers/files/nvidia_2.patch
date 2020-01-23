@@ -1,0 +1,167 @@
+diff -ruN a/kernel/common/inc/nv-procfs.h b/kernel/common/inc/nv-procfs.h
+--- a/kernel/common/inc/nv-procfs.h	2020-01-23 07:23:54.179869626 +0100
++++ b/kernel/common/inc/nv-procfs.h	2020-01-23 08:00:57.964694731 +0100
+@@ -32,10 +32,10 @@
+    ({                                                                    \
+         struct proc_dir_entry *__entry;                                  \
+         int mode = (S_IFREG | S_IRUGO);                                  \
+-        const struct file_operations *fops = &nv_procfs_##__name##_fops; \
+-        if (fops->write != 0)                                            \
++        const struct proc_ops *ops = &nv_procfs_##__name##_fops; \
++        if (ops->proc_write != 0)                                            \
+             mode |= S_IWUSR;                                             \
+-        __entry = proc_create_data(filename, mode, parent, fops, __data);\
++        __entry = proc_create_data(filename, mode, parent, ops, __data);\
+         __entry;                                                         \
+     })
+ 
+@@ -107,12 +107,11 @@
+         return single_release(inode, filep);                                  \
+     }                                                                         \
+                                                                               \
+-    static const struct file_operations nv_procfs_##name##_fops = {           \
+-        .owner      = THIS_MODULE,                                            \
+-        .open       = nv_procfs_open_##name,                                  \
+-        .read       = seq_read,                                               \
+-        .llseek     = seq_lseek,                                              \
+-        .release    = nv_procfs_release_##name,                               \
++    static const struct proc_ops nv_procfs_##name##_fops = {           \
++        .proc_open       = nv_procfs_open_##name,                                  \
++        .proc_read       = seq_read,                                               \
++        .proc_lseek     = seq_lseek,                                              \
++        .proc_release    = nv_procfs_release_##name,                               \
+     };
+ 
+ #endif  /* CONFIG_PROC_FS */
+diff -ruN a/kernel/nvidia/nv-procfs.c b/kernel/nvidia/nv-procfs.c
+--- a/kernel/nvidia/nv-procfs.c	2020-01-23 07:23:54.239866362 +0100
++++ b/kernel/nvidia/nv-procfs.c	2020-01-23 08:00:57.964694731 +0100
+@@ -452,13 +452,12 @@
+     return ((status < 0) ? status : (int)count);
+ }
+ 
+-static struct file_operations nv_procfs_registry_fops = {
+-    .owner   = THIS_MODULE,
+-    .open    = nv_procfs_open_registry,
+-    .read    = seq_read,
+-    .write   = nv_procfs_write_file,
+-    .llseek  = seq_lseek,
+-    .release = nv_procfs_close_registry,
++static struct proc_ops nv_procfs_registry_fops = {
++    .proc_open    = nv_procfs_open_registry,
++    .proc_read    = seq_read,
++    .proc_write   = nv_procfs_write_file,
++    .proc_lseek  = seq_lseek,
++    .proc_release = nv_procfs_close_registry,
+ };
+ 
+ #if defined(CONFIG_PM)
+@@ -531,13 +530,12 @@
+     return single_open(file, nv_procfs_show_suspend_depth, NULL);
+ }
+ 
+-static struct file_operations nv_procfs_suspend_depth_fops = {
+-    .owner   = THIS_MODULE,
+-    .open    = nv_procfs_open_suspend_depth,
+-    .read    = seq_read,
+-    .write   = nv_procfs_write_suspend_depth,
+-    .llseek  = seq_lseek,
+-    .release = single_release
++static struct proc_ops nv_procfs_suspend_depth_fops = {
++    .proc_open    = nv_procfs_open_suspend_depth,
++    .proc_read    = seq_read,
++    .proc_write   = nv_procfs_write_suspend_depth,
++    .proc_lseek  = seq_lseek,
++    .proc_release = single_release
+ };
+ 
+ static int
+@@ -613,13 +611,12 @@
+     return single_open(file, nv_procfs_show_suspend, NULL);
+ }
+ 
+-static struct file_operations nv_procfs_suspend_fops = {
+-    .owner   = THIS_MODULE,
+-    .open    = nv_procfs_open_suspend,
+-    .read    = seq_read,
+-    .write   = nv_procfs_write_suspend,
+-    .llseek  = seq_lseek,
+-    .release = single_release
++static struct proc_ops nv_procfs_suspend_fops = {
++    .proc_open    = nv_procfs_open_suspend,
++    .proc_read    = seq_read,
++    .proc_write   = nv_procfs_write_suspend,
++    .proc_lseek  = seq_lseek,
++    .proc_release = single_release
+ };
+ #endif
+ 
+@@ -724,11 +721,10 @@
+     return status;
+ }
+ 
+-static struct file_operations nv_procfs_exercise_error_forwarding_fops = {
+-    .owner   = THIS_MODULE,
+-    .open    = nv_procfs_open_exercise_error_forwarding,
+-    .write   = nv_procfs_write_file,
+-    .release = nv_procfs_close_exercise_error_forwarding,
++static struct proc_ops nv_procfs_exercise_error_forwarding_fops = {
++    .proc_open    = nv_procfs_open_exercise_error_forwarding,
++    .proc_write   = nv_procfs_write_file,
++    .proc_release = nv_procfs_close_exercise_error_forwarding,
+ };
+ 
+ static int
+@@ -851,13 +847,12 @@
+     return rc;
+ }
+ 
+-static struct file_operations nv_procfs_unbind_lock_fops = {
+-    .owner   = THIS_MODULE,
+-    .open    = nv_procfs_open_unbind_lock,
+-    .read    = seq_read,
+-    .write   = nv_procfs_write_file,
+-    .llseek  = seq_lseek,
+-    .release = nv_procfs_close_unbind_lock,
++static struct proc_ops nv_procfs_unbind_lock_fops = {
++    .proc_open    = nv_procfs_open_unbind_lock,
++    .proc_read    = seq_read,
++    .proc_write   = nv_procfs_write_file,
++    .proc_lseek  = seq_lseek,
++    .proc_release = nv_procfs_close_unbind_lock,
+ };
+ 
+ static const char*
+@@ -1187,21 +1182,19 @@
+     return retval;
+ }
+ 
+-static const struct file_operations nv_procfs_numa_status_fops = {
+-    .owner   = THIS_MODULE,
+-    .open    = nv_procfs_open_numa_status,
+-    .read    = seq_read,
+-    .write   = nv_procfs_write_file,
+-    .llseek  = seq_lseek,
+-    .release = nv_procfs_close_numa_status,
++static const struct proc_ops nv_procfs_numa_status_fops = {
++    .proc_open    = nv_procfs_open_numa_status,
++    .proc_read    = seq_read,
++    .proc_write   = nv_procfs_write_file,
++    .proc_lseek  = seq_lseek,
++    .proc_release = nv_procfs_close_numa_status,
+ };
+ 
+-static const struct file_operations nv_procfs_offline_pages_fops = {
+-    .owner   = THIS_MODULE,
+-    .open    = nv_procfs_open_offline_pages,
+-    .read    = seq_read,
+-    .llseek  = seq_lseek,
+-    .release = nv_procfs_close_offline_pages,
++static const struct proc_ops nv_procfs_offline_pages_fops = {
++    .proc_open    = nv_procfs_open_offline_pages,
++    .proc_read    = seq_read,
++    .proc_lseek  = seq_lseek,
++    .proc_release = nv_procfs_close_offline_pages,
+ };
+ 
+ static int
