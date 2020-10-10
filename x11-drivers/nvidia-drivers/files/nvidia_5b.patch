@@ -1,0 +1,21 @@
+diff -ruN a/kernel/conftest.sh b/kernel/conftest.sh
+--- a/kernel/conftest.sh	2020-06-07 07:17:10.311858046 +0200
++++ b/kernel/conftest.sh	2020-06-07 07:22:01.237277291 +0200
+@@ -143,6 +143,7 @@
+     FILES="$FILES video/nv_internal.h"
+     FILES="$FILES asm/book3s/64/hash-64k.h"
+     FILES="$FILES asm/set_memory.h"
++    FILES="$FILES asm/pgtable.h"
+     FILES="$FILES asm/prom.h"
+     FILES="$FILES asm/powernv.h"
+     FILES="$FILES asm/tlbflush.h"
+@@ -466,6 +467,9 @@
+             # It does not exist on all architectures.
+             #
+             CODE="
++            #if defined(NV_ASM_PGTABLE_H_PRESENT)
++            #include <asm/pgtable.h>
++            #endif
+             #if defined(NV_ASM_SET_MEMORY_H_PRESENT)
+             #include <asm/set_memory.h>
+             #else

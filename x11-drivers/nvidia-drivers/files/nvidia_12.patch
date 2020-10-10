@@ -1,0 +1,24 @@
+diff -ruN a/kernel/nvidia-uvm/uvm8_tools.c b/kernel/nvidia-uvm/uvm8_tools.c
+--- a/kernel/nvidia-uvm/uvm8_tools.c	2020-07-24 15:01:46.659558804 +0200
++++ b/kernel/nvidia-uvm/uvm8_tools.c	2020-07-24 15:11:25.183080031 +0200
+@@ -192,7 +192,7 @@
+ {
+     long event_tracker = atomic_long_read((atomic_long_t *)&filp->private_data);
+ 
+-    smp_read_barrier_depends();
++    smp_mb();
+     return (uvm_tools_event_tracker_t *)event_tracker;
+ }
+ 
+diff -ruN a/kernel/nvidia-uvm/uvm8_va_range.h b/kernel/nvidia-uvm/uvm8_va_range.h
+--- a/kernel/nvidia-uvm/uvm8_va_range.h	2020-07-24 15:01:46.649559460 +0200
++++ b/kernel/nvidia-uvm/uvm8_va_range.h	2020-07-24 15:10:32.594006389 +0200
+@@ -755,7 +755,7 @@
+     // make sure that any initialization of this block by the creating thread is
+     // visible to later accesses in this thread, which requires a data
+     // dependency barrier.
+-    smp_read_barrier_depends();
++    smp_mb();
+     return block;
+ }
+ 
